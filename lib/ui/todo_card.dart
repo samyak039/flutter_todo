@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo/data/todo.dart';
 
-class TodoCard extends StatelessWidget {
+class TodoCard extends StatefulWidget {
   final Todo todo;
 
   const TodoCard({
@@ -9,6 +9,11 @@ class TodoCard extends StatelessWidget {
     required this.todo,
   }) : super(key: key);
 
+  @override
+  State<TodoCard> createState() => _TodoCardState();
+}
+
+class _TodoCardState extends State<TodoCard> {
   @override
   Widget build(BuildContext context) {
     // TODO: make a beautiful card
@@ -21,13 +26,23 @@ class TodoCard extends StatelessWidget {
                 todo.toggleStatus();
               }) */
           Checkbox(
-            value: todo.isDone,
+            value: widget.todo.isDone,
             onChanged: (value) {
-              todo.isDone = value as bool;
-              // todo.toggleStatus();
+              print('>> CHECKED');
+              setState(() {
+                widget.todo.isDone = value as bool;
+              });
             },
           ),
-          Text(todo.task),
+          Text(
+            widget.todo.task,
+            style: (widget.todo.isDone)
+                ? const TextStyle(
+                    decoration: TextDecoration.lineThrough,
+                    color: Colors.grey,
+                  )
+                : const TextStyle(),
+          ),
         ],
       ),
     );

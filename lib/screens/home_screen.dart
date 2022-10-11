@@ -11,23 +11,62 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Todo> todoList = [];
+  List<Todo> todoList = [Todo(task: 'Zero'), Todo(task: 'One')];
+  final textController = TextEditingController();
 
-  void _addTask() {
-    print('<< FAB Pressed');
+  Future<void> _addTask() async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(border: Border.all(color: Colors.red)),
+          height: MediaQuery.of(context).viewInsets.bottom + 64,
+          child: TextField(
+            // controller: tc,
+            controller: textController,
+            autofocus: true,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: 'New Task',
+              suffixIcon: IconButton(
+                  onPressed: () {
+                    print('<> add task');
+                    final task = Todo(task: textController.text);
+                    setState(() {
+                      todoList.add(task);
+                    });
+                    print('>> todolist: $todoList');
+                    textController.clear();
+                  },
+                  icon: const Icon(Icons.check)),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _refreshList() async {
+    print('<> refresh list');
+    setState(() {
+      todoList;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    print("<< todoList: $todoList");
+  }
+
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Todo> todoList = [
-      Todo(task: 'One'),
-      Todo(task: 'Two'),
-      Todo(task: 'Three'),
-    ];
-    for (int i = 0; i < 100; i++) {
-      final task = Todo(task: '$i');
-      todoList.add(task);
-    }
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -35,7 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
             'Title',
           ),
         ),
-        body: Center(
+        body: RefreshIndicator(
+          onRefresh: _refreshList,
           child: ListView.builder(
             padding: const EdgeInsets.all(10),
             itemCount: todoList.length,

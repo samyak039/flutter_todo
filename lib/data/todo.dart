@@ -13,4 +13,10 @@ class Todo {
       isDone = true;
     }
   }
+
+  @override
+  String toString() {
+    final status = isDone ? '[X]' : '[ ]';
+    return '$status $task';
+  }
 }
