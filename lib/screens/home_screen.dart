@@ -30,12 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
               labelText: 'New Task',
               suffixIcon: IconButton(
                   onPressed: () {
-                    print('<> add task');
                     final task = Todo(task: textController.text);
                     setState(() {
                       todoList.add(task);
                     });
-                    print('>> todolist: $todoList');
                     textController.clear();
                   },
                   icon: const Icon(Icons.check)),
@@ -47,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _refreshList() async {
-    print('<> refresh list');
     setState(() {
       todoList;
     });
@@ -56,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    print("<< todoList: $todoList");
   }
 
   @override
@@ -71,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Title',
+            'ToDo',
           ),
         ),
         body: RefreshIndicator(
@@ -79,10 +75,22 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView.builder(
             padding: const EdgeInsets.all(10),
             itemCount: todoList.length,
-            itemBuilder: ((context, index) {
-              print('>> index: $index');
-              return TodoCard(todo: todoList[index]);
-            }),
+            itemBuilder: (context, index) {
+              final todo = todoList[index];
+              return Dismissible(
+                key: Key(todo.toString()),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) {
+                  setState(() {
+                    todoList.removeAt(index);
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${todo.task} deleted')));
+                },
+                background: Container(color: Colors.red),
+                child: TodoCard(todo: todoList[index]),
+              );
+            },
           ),
         ),
         floatingActionButton: FloatingActionButton(
